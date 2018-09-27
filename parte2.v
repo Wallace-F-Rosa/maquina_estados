@@ -57,21 +57,20 @@ endmodule
 // FSM com portas logicas
 // programar ainda....
 module statePorta(input clk, input res, input a, output [2:0] s);
-wire [2:0] e; wire [2:0] p; wire [2:0] out;
-
-
-assign out = e;
-assign p[0]  =  ~e[1]&e[2]&a; // 4 operadores
+wire [2:0] e;
+wire [2:0] p;
+assign s[0] = e[0] | e[2]&~e[1] ; // 2 operadores
+assign s[1] = e[2];
+assign s[2] = ~e[1] & ~e[2]; // 1 operador
+assign p[0]  =  ~e[1]&~e[2]&a; // 4 operadores
 assign p[1]  =  e[0] | ~e[1]&~a; //4 operadores
-assign p[2] =   e[0]| a&~e[2] | e[1]&~e[2] | ~a&~e[1]; //11 operadores
+assign p[2] =   e[0]| a&~e[2] | e[1]&~e[0]&~e[2] | ~a&e[1]; //11 operadores
+
 //total = 22 operadores
+
 ff  e0(p[0],clk,res,e[0]);
 ff  e1(p[1],clk,res,e[1]);
 ff  e2(p[2],clk,res,e[2]);
-
-ff e3(out[0],clk,res,s[0]);
-ff e4(out[1],clk,res,s[1]);
-ff e5(out[2],clk,res,s[2]);
 
 endmodule 
 
@@ -81,33 +80,22 @@ endmodule
 module stateMem(input clk,input res, input a, output [2:0] saida);
 reg [5:0] StateMachine [0:15]; // 16 linhas e 6 bits de largura
 initial
-begin  
+begin  // programar ainda....
 
 StateMachine[0] = 6'h14;  StateMachine[1] = 6'h24;
 StateMachine[2] = 6'h35;  StateMachine[3] = 6'h35;
 StateMachine[4] = 6'h20;  StateMachine[5] = 6'h20;
-StateMachine[6] = 6'h24;  StateMachine[7] = 6'h24;
-StateMachine[8] = 6'h33;  StateMachine[9] = 6'h0B;
-StateMachine[10] = 6'h24;  StateMachine[11] = 6'h24;
+StateMachine[8] = 6'h33;  StateMachine[9] = 6'h0b;
 StateMachine[12] = 6'h02;  StateMachine[13] = 6'h02;
-StateMachine[14] = 6'h24;  StateMachine[15] = 6'h24;
 end
 wire [3:0] address;  // 16 linhas = 4 bits de endereco
 wire [5:0] dout; // 6 bits de largura 3+3 = proximo estado + saida
-wire [5:0] dout2;
 assign address[0] = a;
-assign dout2 = StateMachine[address];
+assign dout = StateMachine[address];
 assign saida = dout[2:0];
-
-ff out1(dout2[0], clk,res,dout[0]);
-ff out2(dout2[1], clk,res,dout[1]);
-ff out3(dout2[2], clk,res,dout[2]);
-ff out4(dout2[3], clk,res,dout[3]);
-ff out5(dout2[4], clk,res,dout[4]); 
-
-ff st0(dout2[3],clk,res,address[1]);
-ff st1(dout2[4],clk,res,address[2]);
-ff st2(dout2[5],clk,res,address[3]);
+ff st0(dout[3],clk,res,address[1]);
+ff st1(dout[4],clk,res,address[2]);
+ff st2(dout[5],clk,res,address[3]);
 endmodule
 
 module main;
