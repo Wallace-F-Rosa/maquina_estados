@@ -60,12 +60,10 @@ module statePorta(input clk, input res, input a, output [2:0] s);
 wire [2:0] e; wire [2:0] p; wire [2:0] out;
 
 
-assign out[0] = e[0] | e[2]&~e[1]  ; // 2 operadores
-assign out[1] = e[2];
-assign out[2] = ~e[1] & ~e[2]; // 1 operador
-assign p[0]  =  ~e[1]&~e[2]&a; // 4 operadores
+assign out = e;
+assign p[0]  =  ~e[1]&e[2]&a; // 4 operadores
 assign p[1]  =  e[0] | ~e[1]&~a; //4 operadores
-assign p[2] =   e[0]| a&~e[2] | e[1]&~e[0]&~e[2] | ~a&e[1]; //11 operadores
+assign p[2] =   e[0]| a&~e[2] | e[1]&~e[2] | ~a&~e[1]; //11 operadores
 //total = 22 operadores
 ff  e0(p[0],clk,res,e[0]);
 ff  e1(p[1],clk,res,e[1]);
@@ -83,13 +81,16 @@ endmodule
 module stateMem(input clk,input res, input a, output [2:0] saida);
 reg [5:0] StateMachine [0:15]; // 16 linhas e 6 bits de largura
 initial
-begin  // programar ainda....
+begin  
 
 StateMachine[0] = 6'h14;  StateMachine[1] = 6'h24;
 StateMachine[2] = 6'h35;  StateMachine[3] = 6'h35;
 StateMachine[4] = 6'h20;  StateMachine[5] = 6'h20;
-StateMachine[8] = 6'h33;  StateMachine[9] = 6'h0b;
+StateMachine[6] = 6'h24;  StateMachine[7] = 6'h24;
+StateMachine[8] = 6'h33;  StateMachine[9] = 6'h0B;
+StateMachine[10] = 6'h24;  StateMachine[11] = 6'h24;
 StateMachine[12] = 6'h02;  StateMachine[13] = 6'h02;
+StateMachine[14] = 6'h24;  StateMachine[15] = 6'h24;
 end
 wire [3:0] address;  // 16 linhas = 4 bits de endereco
 wire [5:0] dout; // 6 bits de largura 3+3 = proximo estado + saida
