@@ -99,6 +99,24 @@ ff st2(dout[2],clk,res,address[4]);
 endmodule
 
 
+module statePorta(input clk, input res, input [1:0] a, output [2:0] s);
+wire [2:0] e;
+wire [2:0] p;
+assign s[0] = e[0] ; 
+assign s[1] = e[1];
+assign s[2] = e[2]&~e[1] | e[2]&~e[0]; // 5 operadores
+assign p[0] = a[1]&~e[0] | a[0]&e[2]&~e[0] | a[1]&~a[0]&~e[1] | a[1]&e[2]&e[1] | a[1]&a[0]&~e[2] | ~a[0]&~e[2]&~e[1]&e[0] ; // 25 operadores
+assign p[1] = a[0]&e[2] | ~a[0]&~e[2]&e[0] | ~e[2]&~e[1]&e[0] | ~a[1]&e[1]&e[0] | ~a[1]&a[0]&~e[1] | a[1]&e[1]&~e[0] | a[1]&e[2]&~e[0] ; //27 operadores
+assign p[2] = ~a[1]&a[0]&~e[2]&e[1]&e[0] | a[1]&~a[0]&~e[2]&e[1]&~e[0] | a[1]&a[0]&~e[2]&~e[1]&~e[0] | a[1]&a[0]&~e[2]&e[1]&e[0] | a[1]&a[0]&e[2]&~e[1]&e[0]; //40 operadores
+
+//total = 97 operadores
+
+ff  e0(p[0],clk,res,e[0]);
+ff  e1(p[1],clk,res,e[1]);
+ff  e2(p[2],clk,res,e[2]);
+
+endmodule 
+
 module main;
 reg c,res;
 reg [1:0] a;
@@ -107,7 +125,7 @@ wire [2:0] saida1;
 wire [2:0] saida2;
 
 stateCase estadocase(c,res,a,saida);
-//statePorta estadoporta(c,res,a,saida2);
+statePorta estadoporta(c,res,a,saida2);
 stateMem estadoMem(c,res,a,saida1);
 
 initial
